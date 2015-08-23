@@ -10,7 +10,7 @@ It currently features:
 - Gated Recurrent Unit Neural Networks
 - Backpropagation Through Time handled via Automatic Differentiation.
 
-ExampleRNN.java shows how to do character-by-character sentence prediction and generation.
+ExamplePaulGraham.java shows how to do character-by-character sentence prediction and generation.
 
 Sample output:
 

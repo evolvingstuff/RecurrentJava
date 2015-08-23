@@ -238,7 +238,6 @@ public class TextGeneration extends DataSet {
 			}
 			sequences.add(sequence);
 		}
-		System.out.println("\nTotal unique words = " + words.size());
 		System.out.println("Total unique chars = " + chars.size());
 		System.out.println(size + " steps in training set.");
 		

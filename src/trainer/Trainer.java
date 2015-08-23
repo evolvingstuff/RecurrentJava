@@ -19,6 +19,10 @@ public class Trainer {
 	public static double gradientClipValue = 5;
 	public static double regularization = 0.000001; // L2 regularization strength
 	
+	public static void train(int trainingEpochs, double learningRate, Model model, DataSet data, int reportEveryNthEpoch, Random rng) throws Exception {
+		train(trainingEpochs, learningRate, model, data, reportEveryNthEpoch, false, false, null, rng);
+	}
+	
 	public static void train(int trainingEpochs, double learningRate, Model model, DataSet data, int reportEveryNthEpoch, boolean initFromSaved, boolean overwriteSaved, String savePath, Random rng) throws Exception {
 		System.out.println("--------------------------------------------------------------");
 		if (initFromSaved) {
