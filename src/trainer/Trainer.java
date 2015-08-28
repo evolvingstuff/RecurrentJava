@@ -19,11 +19,11 @@ public class Trainer {
 	public static double gradientClipValue = 5;
 	public static double regularization = 0.000001; // L2 regularization strength
 	
-	public static void train(int trainingEpochs, double learningRate, Model model, DataSet data, int reportEveryNthEpoch, Random rng) throws Exception {
-		train(trainingEpochs, learningRate, model, data, reportEveryNthEpoch, false, false, null, rng);
+	public static double train(int trainingEpochs, double learningRate, Model model, DataSet data, int reportEveryNthEpoch, Random rng) throws Exception {
+		return train(trainingEpochs, learningRate, model, data, reportEveryNthEpoch, false, false, null, rng);
 	}
 	
-	public static void train(int trainingEpochs, double learningRate, Model model, DataSet data, int reportEveryNthEpoch, boolean initFromSaved, boolean overwriteSaved, String savePath, Random rng) throws Exception {
+	public static double train(int trainingEpochs, double learningRate, Model model, DataSet data, int reportEveryNthEpoch, boolean initFromSaved, boolean overwriteSaved, String savePath, Random rng) throws Exception {
 		System.out.println("--------------------------------------------------------------");
 		if (initFromSaved) {
 			System.out.println("initializing model from saved state...");
@@ -37,10 +37,13 @@ public class Trainer {
 				System.out.println("Continuing from freshly initialized model instead.");
 			}
 		}
+		double result = 1.0;
 		for (int epoch = 0; epoch < trainingEpochs; epoch++) {
-			System.out.println("epoch["+(epoch+1)+"/"+trainingEpochs+"]");
+			
+			String show = "epoch["+(epoch+1)+"/"+trainingEpochs+"]";
 			
 			double reportedLossTrain = pass(learningRate, model, data.training, true, data.lossTraining, data.lossReporting);
+			result = reportedLossTrain;
 			if (Double.isNaN(reportedLossTrain) || Double.isInfinite(reportedLossTrain)) {
 				throw new Exception("WARNING: invalid value for training loss. Try lowering learning rate.");
 			}
@@ -48,16 +51,18 @@ public class Trainer {
 			double reportedLossTesting = 0;
 			if (data.validation != null) {
 				reportedLossValidation = pass(learningRate, model, data.validation, false, data.lossTraining, data.lossReporting);
+				result = reportedLossValidation;
 			}
 			if (data.testing != null) {
 				reportedLossTesting = pass(learningRate, model, data.testing, false, data.lossTraining, data.lossReporting);
+				result = reportedLossTesting;
 			}
-			String show = "\ttrain loss = "+String.format("%.5f", reportedLossTrain);
+			show += "\ttrain loss = "+String.format("%.5f", reportedLossTrain);
 			if (data.validation != null) {
-				show += "\n\tvalid loss = "+String.format("%.5f", reportedLossValidation);
+				show += "\tvalid loss = "+String.format("%.5f", reportedLossValidation);
 			}
 			if (data.testing != null) {
-				show += "\n\ttest loss  = "+String.format("%.5f", reportedLossTesting);
+				show += "\ttest loss  = "+String.format("%.5f", reportedLossTesting);
 			}
 			System.out.println(show);
 			
@@ -75,6 +80,7 @@ public class Trainer {
 				break;
 			}
 		}
+		return result;
 	}
 	
 	public static double pass(double learningRate, Model model, List<DataSequence> sequences, boolean applyTraining, Loss lossTraining, Loss lossReporting) throws Exception {
