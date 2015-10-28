@@ -24,6 +24,7 @@ import model.Nonlinearity;
 
 public class TextGenerationUnbroken extends DataSet {
 
+	private static final long serialVersionUID = 1L;
 	public static int reportSequenceLength = 100;
 	public static boolean reportPerplexity = true;
 	private static Map<String, Integer> charToIndex = new HashMap<>();
