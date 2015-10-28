@@ -26,7 +26,16 @@ import model.Nonlinearity;
 
 public class bAbI extends DataSet{
 	
-	public bAbI(int setId, int totalExamples, Random rng) throws Exception {	
+	public static void main(String[] args) throws Exception {
+		System.out.println("testing...");
+		
+		Random rng = new Random();
+		bAbI data = new bAbI(3, 100, true, rng);
+		
+		System.out.println("done.");
+	}
+	
+	public bAbI(int setId, int totalExamples, boolean onlySupportingFacts, Random rng) throws Exception {	
 		final File folder = new File("datasets/bAbI/en/");
 		List<String> fileNamesTrain = new ArrayList<>();
 		List<String> fileNamesTest = new ArrayList<>();
@@ -47,8 +56,8 @@ public class bAbI extends DataSet{
 	        }
 	    }
 		
-		List<Story> storiesTrain = getStories(fileNamesTrain);
-		List<Story> storiesTest = getStories(fileNamesTest);
+		List<Story> storiesTrain = getStories(fileNamesTrain, onlySupportingFacts);
+		List<Story> storiesTest = getStories(fileNamesTest, onlySupportingFacts);
 		
 		while (storiesTrain.size() > totalExamples) {
 			storiesTrain.remove(rng.nextInt(storiesTrain.size()));
@@ -102,16 +111,21 @@ public class bAbI extends DataSet{
 		public Statement(String line) {
 			String[] parts = line.split("\t");
 			if (parts.length > 1) {
-				String[] words = parts[0].replace("?", "").split(" ");
+				String[] words = parts[0].replace("?", " ?").split(" ");
 				lineNum = Integer.parseInt(words[0]);
 				for (int i = 1; i < words.length; i++) {
 					question.add(words[i].toLowerCase());
 				}
-				answer = parts[1].split(" ")[0].toLowerCase();
+				
+				answer = parts[1].toLowerCase();
+				String[] facts = parts[2].split(" ");
+				for (int i = 0; i < facts.length; i++) {
+					supportingFacts.add(Integer.parseInt(facts[i]));
+				}
 				isFact = false;
 			}
 			else {
-				String[] words = line.replace(".","").split(" ");
+				String[] words = line.replace("."," .").split(" ");
 				lineNum = Integer.parseInt(words[0]);
 				for (int i = 1; i < words.length; i++) {
 					fact.add(words[i].toLowerCase());
@@ -133,6 +147,9 @@ public class bAbI extends DataSet{
 					result += " " + word;
 				}
 				result += " -> " + answer;
+				for (Integer i : supportingFacts) {
+					result += " " + i;
+				}
 			}
 			return result;
 		}
@@ -140,12 +157,32 @@ public class bAbI extends DataSet{
 		List<String> fact = new ArrayList<>();
 		List<String> question = new ArrayList<>();
 		String answer;
+		List<Integer> supportingFacts = new ArrayList<>();
 		int lineNum;
 	}
 	
 	class Story {
-		public Story(List<Statement> statements) {
-			this.statements = statements;
+		public Story(List<Statement> statements, boolean onlySupportingFacts) {
+			
+			if (onlySupportingFacts == true) {
+				Set<Integer> supportingFactsAndQuestions = new HashSet<>();
+				for (Statement statement : statements) {
+					if (statement.isFact == false) {
+						supportingFactsAndQuestions.add(statement.lineNum);
+						supportingFactsAndQuestions.addAll(statement.supportingFacts);
+					}
+				}
+				List<Statement> trimmed = new ArrayList<>();
+				for (Statement statement : statements) {
+					if (supportingFactsAndQuestions.contains(statement.lineNum)) {
+						trimmed.add(statement);
+					}
+				}
+				this.statements = trimmed;
+			}
+			else {
+				this.statements = statements;
+			}
 		}
 		List<Statement> statements;
 		
@@ -159,7 +196,7 @@ public class bAbI extends DataSet{
 		}
 	}
 	
-	List<Story> getStories(List<String> fileNames) throws Exception {
+	List<Story> getStories(List<String> fileNames, boolean onlySupportingFacts) throws Exception {
 		List<Statement> statements = new ArrayList<>();
 		for (String fileName : fileNames) {	
 			File file = new File(fileName);
@@ -183,7 +220,9 @@ public class bAbI extends DataSet{
 					errors++;
 				}
 				else {
-					stories.add(new Story(storyList));
+					Story story = new Story(storyList, onlySupportingFacts);
+					//System.out.println(story);
+					stories.add(story);
 				}
 				containsQuestion = false;
 				storyList = new ArrayList<>();
@@ -194,7 +233,9 @@ public class bAbI extends DataSet{
 			storyList.add(statement);
 			prevNum = statement.lineNum;
 		}
-		stories.add(new Story(storyList));
+		Story story = new Story(storyList, onlySupportingFacts);
+		//System.out.println(story);
+		stories.add(story);
 		if (errors > 0) {
 			System.out.println("WARNING: " + errors + " INCORRECT STORIES REMOVED.");
 		}

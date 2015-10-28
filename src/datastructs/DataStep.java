@@ -1,9 +1,12 @@
 package datastructs;
+import java.io.Serializable;
+
 import matrix.Matrix;
 
 
-public class DataStep {
+public class DataStep implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	public Matrix input = null;
 	public Matrix targetOutput = null;
 	

@@ -1,9 +1,12 @@
 package datastructs;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class DataSequence {
+public class DataSequence implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	public List<DataStep> steps = new ArrayList<>();
 	
 	public DataSequence() {

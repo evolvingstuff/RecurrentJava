@@ -1,4 +1,5 @@
 package datastructs;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 
@@ -6,7 +7,7 @@ import loss.Loss;
 import model.Model;
 import model.Nonlinearity;
 
-public abstract class DataSet {
+public abstract class DataSet implements Serializable {
 	public int inputDimension;
 	public int outputDimension;
 	public Loss lossTraining;

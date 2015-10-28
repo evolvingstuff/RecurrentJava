@@ -4,6 +4,11 @@ import matrix.Matrix;
 
 public class LossMultiDimensionalBinary implements Loss {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	public void backward(Matrix actualOutput, Matrix targetOutput) throws Exception {
 		throw new Exception("not implemented");

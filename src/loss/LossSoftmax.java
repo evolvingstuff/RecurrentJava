@@ -12,6 +12,11 @@ import util.Util;
 
 public class LossSoftmax implements Loss {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	public void backward(Matrix logprobs, Matrix targetOutput) throws Exception {
 		int targetIndex = getTargetIndex(targetOutput);

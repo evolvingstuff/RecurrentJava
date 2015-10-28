@@ -64,6 +64,8 @@ public class ExampleQuestionAnswering {
 		int epochsPerTask = 50;
 		int experiments = 1;
 		
+		boolean onlyShowSupportingFacts = false;
+		
 		double[] losses = new double[bAbI.TASK_NAMES.length];
 		
 		for (int experiment = 0; experiment < experiments; experiment++) {
@@ -76,7 +78,7 @@ public class ExampleQuestionAnswering {
 			
 				int totalExamples = 1000;
 				
-				DataSet data = new bAbI(setId, totalExamples, rng);
+				DataSet data = new bAbI(setId, totalExamples, onlyShowSupportingFacts, rng);
 
 				Model nn = NeuralNetworkHelper.makeLstm( 
 						data.inputDimension,
